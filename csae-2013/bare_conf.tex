@@ -416,13 +416,15 @@ Changsha, China.\\
 
 \begin{abstract}
 %\boldmath
-Concurrent programming has always been difficult work for it's not as intuitional as sequential
-programming, and there are too many subtle details to deal with. In this paper we 
+Concurrent programming has always been difficult because it's not as intuitional as sequential
+programming. Programmers have to deal with subtle details such as forking threads and
+synchronizing, which is tiresome and error prone . In this paper we 
 design a high-level abstraction for data-flow drived concurrent programming using the functional
-programming language Haskell. The abstraction provides a very clean, elegent and powerful
-programming interface to the programmers so as to simplify the work of concurrent programming.
-Our abstract interface make programs coded like sequential ones but scheduled concurrently,
-and it works well with exceptions.
+programming language Haskell. The abstraction provides a very clean, elegant and powerful
+programming interface to the programmers so as to ease the work of concurrent programming.
+Our abstract interface enables programmer to write sequential like programs while benefiting from
+parallel hardware. The programs are automatically scheduled on multiple threads and run concurrently.
+The performance is competitive and exceptions are handled properly.
 \end{abstract}
 % IEEEtran.cls defaults to using nonbold math in the Abstract.
 % This preserves the distinction between vectors and scalars. However,
@@ -557,7 +559,7 @@ more processors on a single chip. So concurrent programming is becoming the main
 programming technique. But concurrent programming has always been hard work. The logic
 of concurrent programs are not as intuitional as the traditional sequential ones.
 And programmers have to deal with lots of subtles details like forking threads,
-synchronising, catching exceptions etc.
+synchronizing, catching exceptions etc.
 
 People have been working to estimate the difficulty of concurrent programming. Some use
 the Data Parallel techniques, which is adopted to vector processors and DSPs, and
@@ -654,7 +656,7 @@ by the definition of arrow type \texttt{SomeArrow}.
       arrow :: SomeArrow a b
 \end{verbatim}
 
-Arrows provide an elegent interface for programmers. The main combinator for arrows are listed in figure
+Arrows provide an elegant interface for programmers. The main combinator for arrows are listed in figure
 \ref{fig:arrows-interface}. \texttt{id} is the identity arrow which output its input without any processing.
 \texttt{>>>} connect tow arrow of type \texttt{A a b} and \texttt{A b c} and return a new arrow of type
 \texttt{A a c}. \texttt{***} combines two arrows as one without affect each other. \texttt{\&\&\&} combines
@@ -831,26 +833,89 @@ respectively and Dad will spend 0.3 hour decorating the house. If all work are d
 sequentially, it will cost $0.5+1+0.6+0.8+0.7+0.3=3.9$ hours. But all family members should
 work independently and only 1.6 hours is needed indeed.
 
-We code the problem both in ordinary sequential style and with our concurrent arrow interface.
-The results of both programs are shown as below. In the simulation, we use one second to represent
-an hour. The terminal output is modified to save space. The result show that our arrow
-interface works well and can reach almost the ideal performance.
-\begin{verbatim}
-$> time christmas_cio
-"Dad: All materials are here!"
-"Tommy: A beauful Christmas Tree!"
-"Lucy: How beautiful the decorators are!"
-"David: Sweeping the house is tiresome!"
-"Mum: Dinner is ready!"
-"Dad: The house is decorated!"
-"All work is done! The party begins!"
+We have three versions of implementation, the first in ordinary sequential style,
+the second in ordinary concurrent style which explicitly fork threads and synchronize,
+the third coded with our concurrent arrow interface.
+The results of all three programs are shown in table \ref{tab:simulating-result}.
+In the simulation, two OS threads are harnessed in the second and third versions.
+We use one second to represent an hour. Elapsed time is measured using standard unix
+\texttt{time} utility. We can see all three programs have the performance as
+expected, and the version using arrow interface runs as fast as ordinary concurrent
+version.
+\begin{table}
+%% increase table row spacing, adjust to taste
+%% \renewcommand{\arraystretch}{1.3}
+%% if using array.sty, it might be a good idea to tweak the value of
+%% \extrarowheight as needed to properly center the text within the cells
+\caption{Simulating result of Christmas Eve properly}
+\label{tab:simulating-result}
+\centering
+\begin{tabular}{|c||c||c||c|}
+\hline
+Version & Sequential & Explicit Concurrency & Arrow Interface\\
+\hline
+Time(s) & 3.909 & 1.606 & 1.606\\
+\hline
+\end{tabular}
+\end{table}
+%% The terminal output is modified to save space. The result show that our arrow
+%% interface works well and can reach almost the ideal performance.
+%% \begin{verbatim}
+%% $> time christmas_cio
+%% "Dad: All materials are here!"
+%% "Tommy: A beauful Christmas Tree!"
+%% "Lucy: How beautiful the decorators are!"
+%% "David: Sweeping the house is tiresome!"
+%% "Mum: Dinner is ready!"
+%% "Dad: The house is decorated!"
+%% "All work is done! The party begins!"
 
-real	0m1.605s
-$> time christmas
-"Dad: All materials are here!"
-... # same as above with order changed
-real	0m3.909s
-\end{verbatim}
+%% real	0m1.606s
+%% $> time christmas
+%% "Dad: All materials are here!"
+%% ... # same as above with order changed
+%% real	0m3.909s
+%% \end{verbatim}
+
+In the Christmas Eve testcase, we put threads to sleep to simulate time elapsing and the
+processors actually do no meaningful work. We will use another testcase to show how are the concurrent
+tasks are scheduled on multiple OS threads. In this testcase we want to find all prime numbers in a range 
+$[0, n]$. Because the primeness judgements of integral numbers are indepedent of each other, so we can
+adopt a divide-and-conquer algorithm. The big range is splited to some smaller ones and computed
+indepedently, and the results are collected as a whole at last. We show the data-flow graph in figure
+\ref{fig:divide-and-conquer}. We use the ThreadScope utility to show the runtime statistics of our program, as
+shown in figure \ref{fig:runtime-statistics}. Two OS threads are harnessed, named as HEC0 and HEC1,
+the green bar means the OS thread is working, and yellow bar stands for garbage collecting operations done
+by the Haskell Runtime System. From figure \ref{fig:runtime-statistics} we see that all workload are banlanced
+well on multiple OS threads.
+\begin{figure}
+  \centering
+  \includegraphics[scale=0.38]{example3.png}
+  \caption{Data-flow graph of divide-and-conquer}
+  \label{fig:divide-and-conquer}
+\end{figure}
+\begin{figure*}[!t]
+  \centerline{
+    \subfloat[Workload on multiple OS threads]{
+      \includegraphics[scale=0.3]{divide-and-conquer.png}%
+      \label{subfig:runtime-statistics}
+    }
+    \hfil
+    \subfloat[Time line zoomed in for details]{
+      \includegraphics[scale=0.3]{divide-and-conquer-details.png}%
+      \label{subfig:runtime-statistics-details}
+    }
+  }
+  \caption{Runtime statistics of divide-and-conquer}
+  \label{fig:runtime-statistics}
+\end{figure*}
+
+%% \begin{figure*}
+%%   \centering
+%%   \includegraphics[scale=0.35]{divide-and-conquer.png}
+%%   \caption{Runtime statistics of divide-and-conquer}
+%%   \label{fig:runtime-statistics}
+%% \end{figure*}
 
 \section{Conclusion}
 In this paper we show our design of a high-level abstraction of data-flow drived concurrent
@@ -861,7 +926,7 @@ the programmers are freed from taking care of all the subtle details of concurre
 
 The main contributions are:
 \begin{itemize}
-  \item An elegent arrow interface for expressing data-flow problems.
+  \item An elegant arrow interface for expressing data-flow problems.
   \item The concurrent tasks is automatically scheduled, without disturbing the programmers.
   \item Good performance with exception safety.
 \end{itemize}

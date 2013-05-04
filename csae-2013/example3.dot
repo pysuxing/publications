@@ -1,0 +1,16 @@
+digraph G {
+        n1[label="big list"];
+        n2[label="sublist 1"];
+        n3[label="sublist 2"];
+        n4[label="sublist 3"];
+        n5[label="sublist 4"];
+        n6[label="collect"];
+        n1 -> n2;
+        n1 -> n3;
+        n1 -> n4;
+        n1 -> n5;
+        n2 -> n6;
+        n3 -> n6;
+        n4 -> n6;
+        n5 -> n6;
+}

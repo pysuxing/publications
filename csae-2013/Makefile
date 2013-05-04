@@ -8,12 +8,15 @@ bare_conf.bbl: bare_conf.aux
 bare_conf.aux: bare_conf.tex figures
 	pdflatex bare_conf.tex
 
-figures: example1.png example2.png christmas-dataflow.png
+figures: example1.png example2.png example3.png christmas-dataflow.png divide-and-conquer.png
 
 example1.png: example1.dot
 	dot -Tpng -o $@ $^
 
 example2.png: example2.dot
+	dot -Tpng -o $@ $^
+
+example3.png: example3.dot
 	dot -Tpng -o $@ $^
 
 christmas-dataflow.png: christmas-dataflow.dot
