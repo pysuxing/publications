@@ -1,0 +1,12 @@
+digraph G {
+        n1[label="f"];
+        n2[label="g"];
+        n3[label="h"];
+        n4[label="j"];
+        n5[label="k"];
+        n1 -> n3;
+        n2 -> n3;
+        n2 -> n4;
+        n3 -> n5;
+        n4 -> n5;
+}

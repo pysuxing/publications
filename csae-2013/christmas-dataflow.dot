@@ -1,0 +1,19 @@
+digraph G {
+        { rank = same; n2; n3; n4; n5}
+        n1[label="Dad: Purchase materials"];
+        n2[label="Mum: Prepare dinner"];
+        n3[label="Tommy: Trim tree"];
+        n4[label="David: Sweep house"];
+        n5[label="Lucy: Make decorations"];
+        n6[label="Dad: Decorate house"];
+        n7[label="The party begin!"];
+        n1 -> n2;
+        n1 -> n3;
+        n1 -> n4;
+        n1 -> n5;
+        n3 -> n6;
+        n4 -> n6;
+        n5 -> n6;
+        n2 -> n7;
+        n6 -> n7;
+}
