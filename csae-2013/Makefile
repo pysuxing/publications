@@ -23,4 +23,4 @@ christmas-dataflow.png: christmas-dataflow.dot
 	dot -Tpng -o $@ $^
 
 clean:
-	rm -f *.pdf *.dvi *.aux *.bbl *.blg *.log *.png
+	rm -f *.pdf *.dvi *.aux *.bbl *.blg *.log
