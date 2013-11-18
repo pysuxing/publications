@@ -1,12 +1,12 @@
-bare_conf.pdf: bare_conf.bbl
-	pdflatex bare_conf.tex
-	pdflatex bare_conf.tex
+bare_conf_zh.pdf: bare_conf_zh.bbl
+	xelatex bare_conf_zh.tex
+	xelatex bare_conf_zh.tex
 
-bare_conf.bbl: bare_conf.aux
-	bibtex bare_conf.aux
+bare_conf_zh.bbl: bare_conf.bbl
+	cp bare_conf.bbl bare_conf_zh.bbl
 
-bare_conf.aux: bare_conf.tex figures
-	pdflatex bare_conf.tex
+bare_conf_zh.aux: bare_conf_zh.tex figures
+	cp bare_conf.aux bare_conf_zh.aux
 
 figures: example1.png example2.png example3.png christmas-dataflow.png
 
